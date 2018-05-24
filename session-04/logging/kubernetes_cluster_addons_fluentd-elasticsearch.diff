@@ -1,0 +1,185 @@
+diff --git a/cluster/addons/fluentd-elasticsearch/es-service.yaml b/cluster/addons/fluentd-elasticsearch/es-service.yaml
+index ede9306..e98e7d8 100644
+--- a/cluster/addons/fluentd-elasticsearch/es-service.yaml
++++ b/cluster/addons/fluentd-elasticsearch/es-service.yaml
+@@ -2,7 +2,7 @@ apiVersion: v1
+ kind: Service
+ metadata:
+   name: elasticsearch-logging
+-  namespace: kube-system
++  namespace: logging
+   labels:
+     k8s-app: elasticsearch-logging
+     kubernetes.io/cluster-service: "true"
+diff --git a/cluster/addons/fluentd-elasticsearch/es-statefulset.yaml b/cluster/addons/fluentd-elasticsearch/es-statefulset.yaml
+index 36adf38..095d655 100644
+--- a/cluster/addons/fluentd-elasticsearch/es-statefulset.yaml
++++ b/cluster/addons/fluentd-elasticsearch/es-statefulset.yaml
+@@ -3,7 +3,7 @@ apiVersion: v1
+ kind: ServiceAccount
+ metadata:
+   name: elasticsearch-logging
+-  namespace: kube-system
++  namespace: logging
+   labels:
+     k8s-app: elasticsearch-logging
+     kubernetes.io/cluster-service: "true"
+@@ -30,7 +30,7 @@ rules:
+ kind: ClusterRoleBinding
+ apiVersion: rbac.authorization.k8s.io/v1
+ metadata:
+-  namespace: kube-system
++  namespace: logging
+   name: elasticsearch-logging
+   labels:
+     k8s-app: elasticsearch-logging
+@@ -39,7 +39,7 @@ metadata:
+ subjects:
+ - kind: ServiceAccount
+   name: elasticsearch-logging
+-  namespace: kube-system
++  namespace: logging
+   apiGroup: ""
+ roleRef:
+   kind: ClusterRole
+@@ -51,7 +51,7 @@ apiVersion: apps/v1
+ kind: StatefulSet
+ metadata:
+   name: elasticsearch-logging
+-  namespace: kube-system
++  namespace: logging
+   labels:
+     k8s-app: elasticsearch-logging
+     version: v5.6.4
+@@ -78,7 +78,7 @@ spec:
+         resources:
+           # need more cpu upon initialization, therefore burstable class
+           limits:
+-            cpu: 1000m
++            cpu: 500m
+           requests:
+             cpu: 100m
+         ports:
+diff --git a/cluster/addons/fluentd-elasticsearch/fluentd-es-configmap.yaml b/cluster/addons/fluentd-elasticsearch/fluentd-es-configmap.yaml
+index 5b86108..e287b2c 100644
+--- a/cluster/addons/fluentd-elasticsearch/fluentd-es-configmap.yaml
++++ b/cluster/addons/fluentd-elasticsearch/fluentd-es-configmap.yaml
+@@ -2,7 +2,7 @@ kind: ConfigMap
+ apiVersion: v1
+ metadata:
+   name: fluentd-es-config-v0.1.4
+-  namespace: kube-system
++  namespace: logging
+   labels:
+     addonmanager.kubernetes.io/mode: Reconcile
+ data:
+@@ -214,7 +214,7 @@ data:
+     </source>
+ 
+     # Example:
+-    # I1118 21:26:53.975789       6 proxier.go:1096] Port "nodePort for kube-system/default-http-backend:http" (:31429/tcp) was open before and is still needed
++    # I1118 21:26:53.975789       6 proxier.go:1096] Port "nodePort for logging/default-http-backend:http" (:31429/tcp) was open before and is still needed
+     <source>
+       @id kube-proxy.log
+       @type tail
+@@ -244,7 +244,7 @@ data:
+     </source>
+ 
+     # Example:
+-    # I0204 06:55:31.872680       5 servicecontroller.go:277] LB already exists and doesn't need update for service kube-system/kube-ui
++    # I0204 06:55:31.872680       5 servicecontroller.go:277] LB already exists and doesn't need update for service logging/kube-ui
+     <source>
+       @id kube-controller-manager.log
+       @type tail
+@@ -390,7 +390,7 @@ data:
+       @type forward
+     </source>
+ 
+-  monitoring.conf: |-
++  logging.conf: |-
+     # Prometheus Exporter Plugin
+     # input plugin that exports metrics
+     <source>
+diff --git a/cluster/addons/fluentd-elasticsearch/fluentd-es-ds.yaml b/cluster/addons/fluentd-elasticsearch/fluentd-es-ds.yaml
+index eecd6b4..8b76911 100644
+--- a/cluster/addons/fluentd-elasticsearch/fluentd-es-ds.yaml
++++ b/cluster/addons/fluentd-elasticsearch/fluentd-es-ds.yaml
+@@ -2,7 +2,7 @@ apiVersion: v1
+ kind: ServiceAccount
+ metadata:
+   name: fluentd-es
+-  namespace: kube-system
++  namespace: logging
+   labels:
+     k8s-app: fluentd-es
+     kubernetes.io/cluster-service: "true"
+@@ -38,7 +38,7 @@ metadata:
+ subjects:
+ - kind: ServiceAccount
+   name: fluentd-es
+-  namespace: kube-system
++  namespace: logging
+   apiGroup: ""
+ roleRef:
+   kind: ClusterRole
+@@ -49,7 +49,7 @@ apiVersion: apps/v1
+ kind: DaemonSet
+ metadata:
+   name: fluentd-es-v2.0.4
+-  namespace: kube-system
++  namespace: logging
+   labels:
+     k8s-app: fluentd-es
+     version: v2.0.4
+@@ -94,8 +94,6 @@ spec:
+           readOnly: true
+         - name: config-volume
+           mountPath: /etc/fluent/config.d
+-      nodeSelector:
+-        beta.kubernetes.io/fluentd-ds-ready: "true"
+       terminationGracePeriodSeconds: 30
+       volumes:
+       - name: varlog
+diff --git a/cluster/addons/fluentd-elasticsearch/kibana-deployment.yaml b/cluster/addons/fluentd-elasticsearch/kibana-deployment.yaml
+index 8cd00fe..f5f41cb 100644
+--- a/cluster/addons/fluentd-elasticsearch/kibana-deployment.yaml
++++ b/cluster/addons/fluentd-elasticsearch/kibana-deployment.yaml
+@@ -2,7 +2,7 @@ apiVersion: apps/v1
+ kind: Deployment
+ metadata:
+   name: kibana-logging
+-  namespace: kube-system
++  namespace: logging
+   labels:
+     k8s-app: kibana-logging
+     kubernetes.io/cluster-service: "true"
+@@ -23,14 +23,14 @@ spec:
+         resources:
+           # need more cpu upon initialization, therefore burstable class
+           limits:
+-            cpu: 1000m
++            cpu: 500m
+           requests:
+             cpu: 100m
+         env:
+           - name: ELASTICSEARCH_URL
+             value: http://elasticsearch-logging:9200
+           - name: SERVER_BASEPATH
+-            value: /api/v1/namespaces/kube-system/services/kibana-logging/proxy
++            value: /api/v1/namespaces/logging/services/kibana-logging/proxy
+           - name: XPACK_MONITORING_ENABLED
+             value: "false"
+           - name: XPACK_SECURITY_ENABLED
+diff --git a/cluster/addons/fluentd-elasticsearch/kibana-service.yaml b/cluster/addons/fluentd-elasticsearch/kibana-service.yaml
+index d241ef7..25cc9b0 100644
+--- a/cluster/addons/fluentd-elasticsearch/kibana-service.yaml
++++ b/cluster/addons/fluentd-elasticsearch/kibana-service.yaml
+@@ -2,7 +2,7 @@ apiVersion: v1
+ kind: Service
+ metadata:
+   name: kibana-logging
+-  namespace: kube-system
++  namespace: logging
+   labels:
+     k8s-app: kibana-logging
+     kubernetes.io/cluster-service: "true"
