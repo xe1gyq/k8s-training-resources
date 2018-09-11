@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: api-team-quota
+  namespace: team-api
+spec:
+  hard: # Quotas go here
+    requests.cpu: 1
+    requests.memory: 1Gi
+

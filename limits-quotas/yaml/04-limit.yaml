@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: team-api-limits
+  namespace: team-api
+spec:
+  limits:
+  - max:
+      cpu: 1
+      memory: 512Mi
+    type: Container
+
