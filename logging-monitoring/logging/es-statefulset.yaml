@@ -77,12 +77,9 @@ spec:
         name: elasticsearch-logging
         resources:
           # need more cpu upon initialization, therefore burstable class
-          limits:
-            cpu: 500m
-            memory: 1536m
           requests:
             cpu: 100m
-            memory: 1024m
+            memory: 1000m
         ports:
         - containerPort: 9200
           name: db
