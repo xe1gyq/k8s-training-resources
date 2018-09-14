@@ -12,14 +12,14 @@ mkdir -p $KUBE_DNS_WORKING_FOLDER
 
 # Download source files
 
-wget "https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/dns/Makefile" -P $KUBE_DNS_WORKING_FOLDER
+wget "https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/dns/kube-dns/Makefile" -P $KUBE_DNS_WORKING_FOLDER
 
-wget "https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/dns/kube-dns.yaml.base" -P $KUBE_DNS_WORKING_FOLDER
+wget "https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/dns/kube-dns/kube-dns.yaml.base" -P $KUBE_DNS_WORKING_FOLDER
 
 wget "https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/dns/coredns.yaml.base" -P $KUBE_DNS_WORKING_FOLDER
 
-wget "https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/dns/transforms2salt.sed" -P $KUBE_DNS_WORKING_FOLDER
-wget "https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/dns/transforms2sed.sed" -P $KUBE_DNS_WORKING_FOLDER
+wget "https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/dns/kube-dns/transforms2salt.sed" -P $KUBE_DNS_WORKING_FOLDER
+wget "https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/dns/kube-dns/transforms2sed.sed" -P $KUBE_DNS_WORKING_FOLDER
 
 # Install required software
 
